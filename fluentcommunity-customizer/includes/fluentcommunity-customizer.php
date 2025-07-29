@@ -11,3 +11,5 @@ defined('ABSPATH') || exit;
 
 // Load settings page
 require_once plugin_dir_path(__FILE__) . 'includes/settings.php';
+require_once plugin_dir_path(__FILE__) . 'includes/notifications.php';
+
