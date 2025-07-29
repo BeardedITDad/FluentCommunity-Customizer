@@ -49,7 +49,12 @@ function fcom_register_settings() {
         'fcom_main_section'
     );
 }
-
+add_settings_section(
+    'fcom_manual_section',
+    'Manual Tools',
+    null,
+    'fcom-settings'
+);
 /**
  * Render checkbox: Enable default prefs for new users.
  */
