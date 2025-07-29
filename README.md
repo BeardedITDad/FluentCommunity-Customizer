@@ -1,5 +1,5 @@
-# Fluentcommunity
-Fluentcommunity code modification snippets 
+# Fluent Community code modification snippets 
+---
 # WordPress + FluentCommunity Automation Snippets
 
 This repository contains a collection of **custom code snippets** designed to enhance and automate WordPress sites running **FluentCommunity**, **Paid Memberships Pro**, and related tools.
