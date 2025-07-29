@@ -79,12 +79,18 @@ function fcom_render_settings_page() {
     <div class="wrap">
         <h1>FluentCommunity Customizer</h1>
         <form method="post" action="options.php">
-            <?php
-                settings_fields('fcom_settings_group');
-                do_settings_sections('fcom-settings');
-                submit_button();
-            ?>
+            <?php if (isset($_GET['notifications']) && $_GET['notifications'] === 'success') : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p>Notifications applied to all existing users.</p>
+                </div>
+            <?php endif; ?>
+
+            <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+                <?php wp_nonce_field('fcom_apply_notifications'); ?>
+                <input type="hidden" name="action" value="fcom_apply_notifications_now">
+                <?php submit_button('Apply Default Notifications to All Users'); ?>
         </form>
+
     </div>
     <?php
 }
