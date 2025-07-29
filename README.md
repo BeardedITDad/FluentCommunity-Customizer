@@ -4,7 +4,7 @@ Fluentcommunity code modification snippets
 
 This repository contains a collection of **custom code snippets** designed to enhance and automate WordPress sites running **FluentCommunity**, **Paid Memberships Pro**, and related tools.
 
-These scripts solve real-world problems for site admins, from auto-generating usernames to setting default notification preferences for new spaces. All snippets are safe to copy and paste directly into your WordPress site’s `functions.php` file.
+These scripts solve real-world problems for site admins, from auto-generating usernames to setting default notification preferences for new spaces. All snippets are safe to copy and paste directly into your WordPress site’s `functions.php` file **(preferably inside a child theme — more on that below).**
 
 ---
 
@@ -19,34 +19,53 @@ These scripts solve real-world problems for site admins, from auto-generating us
 
 ## 📥 How to Use These Snippets
 
-> These scripts are intended to be copy-pasted into your WordPress site's `functions.php` file.
+> These snippets are intended to be copy-pasted into your WordPress theme’s `functions.php` file.
 
-Follow these steps:
+### ⚠️ Use a Child Theme (Important!)
+
+To avoid losing your changes when your theme updates, always use a **child theme**.
+
+#### What is a child theme?
+A child theme is a WordPress theme that inherits the functionality and styling of another theme (the “parent”), and allows you to safely make customizations.
+
+#### Don’t have a child theme yet?
+You can create one by following this guide:  
+👉 [WordPress: How to Create a Child Theme](https://developer.wordpress.org/themes/advanced-topics/child-themes/)
+
+Or use a plugin like:
+- [Child Theme Configurator](https://wordpress.org/plugins/child-theme-configurator/)
+
+---
 
 ### 🔧 Step-by-Step Instructions
 
-#### 1. Access Your WordPress Theme Folder
-- Go to your WordPress dashboard.
-- Navigate to **Appearance > Theme File Editor**.
-- On the right-hand side, click on `functions.php` under your active theme.
+#### 1. Open Your Child Theme’s `functions.php`
 
-Alternatively, if you have FTP or file access:
+**Via WordPress dashboard:**
+- Go to **Appearance > Theme File Editor**
+- Choose your **child theme**
+- Click on `functions.php` in the right-hand sidebar
+
+**Or via FTP/file manager:**
 - Navigate to:  
-  `/wp-content/themes/your-active-theme/functions.php`
+  `/wp-content/themes/your-child-theme/functions.php`
 
-#### 2. Backup First (Optional but Recommended)
-Before editing, make a quick backup of your existing `functions.php` file in case you need to roll back changes.
+#### 2. Backup First (Optional but Smart)
+Save a copy of your current `functions.php` before making changes.
 
 #### 3. Copy a Snippet
-- Browse this repository and open the file that fits your need.
-- Copy the entire PHP code block.
+Open the file from this repo that matches what you need and copy the code.
 
-#### 4. Paste into `functions.php`
-- Scroll to the bottom of your `functions.php` file (but before the closing `?>` tag if there is one).
-- Paste the snippet you copied.
+#### 4. Paste It In
+Paste the code at the bottom of `functions.php` — make sure it’s inside the PHP block and **before any closing `?>` tag**, if present.
 
-#### 5. Save Your Changes
-- In the Theme Editor, click **Update File**.
-- If using FTP, save the file and re-upload it to the server.
+#### 5. Save the File
+- Click **Update File** (in the WordPress editor), or
+- Save/upload the file via FTP
 
-That’s it! Your new functionality should now be live.
+That’s it! Your custom functionality is now live.
+
+---
+
+
+
