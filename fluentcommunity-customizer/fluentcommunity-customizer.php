@@ -20,7 +20,7 @@ add_action('plugins_loaded', function () {
         require_once $update_checker_path;
 
         if (class_exists('Puc_v4_Factory')) {
-            $updateChecker = Puc_v4_Factory::buildUpdateChecker(
+            $updateChecker = Puc_v5p6_Factory::buildUpdateChecker(
                 'https://github.com/BeardedITDad/Fluentcommunity',
                 __FILE__,
                 'fluentcommunity-customizer'
