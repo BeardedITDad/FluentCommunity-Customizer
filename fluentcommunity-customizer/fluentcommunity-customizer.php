@@ -5,6 +5,7 @@
  * Version: 1.0.2
  * Author: Snow Media Group LLC
  * License: GPL2
+ * Update URI: https://github.com/BeardedITDad/Fluentcommunity/
  */
 defined('ABSPATH') || exit;
 
