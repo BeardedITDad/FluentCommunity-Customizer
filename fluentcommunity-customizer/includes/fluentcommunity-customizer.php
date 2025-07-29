@@ -3,7 +3,7 @@
  * Plugin Name: FluentCommunity Customizer
  * Description: Manage FluentCommunity user preferences and syncs with a UI dashboard.
  * Version: 1.0.0
- * Author: Dakota Snow
+ * Author: Snow Media Group LLC
  * License: GPL2
  */
 
