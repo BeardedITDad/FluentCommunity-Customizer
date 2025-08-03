@@ -1,114 +1,104 @@
 <?php
-// Exit if accessed directly.
-defined('ABSPATH') || exit;
 
-/**
- * Register admin hooks after plugins load.
- */
-function fcom_register_admin_settings_hooks() {
-    add_action('admin_menu', 'fcom_add_settings_page');
-    add_action('admin_init', 'fcom_register_settings');
-}
-add_action('plugins_loaded', 'fcom_register_admin_settings_hooks');
-
-/**
- * Add settings page to WP admin.
- */
-function fcom_add_settings_page() {
-    add_options_page(
+// Add the admin menu item
+function fcc_register_settings_page() {
+    add_menu_page(
         'FluentCommunity Settings',
         'FluentCommunity',
         'manage_options',
-        'fcom-settings',
-        'fcom_render_settings_page'
+        'fluentcommunity-settings',
+        'fcc_render_settings_page',
+        'dashicons-admin-generic',
+        80
     );
 }
+add_action('admin_menu', 'fcc_register_settings_page');
 
-/**
- * Register settings and sections.
- */
-function fcom_register_settings() {
-    register_setting('fcom_settings_group', 'fcom_enable_user_defaults');
-    register_setting('fcom_settings_group', 'fcom_enable_space_sync');
-
-    add_settings_section(
-        'fcom_main_section',
-        'Plugin Features',
-        function() {
-            echo '<p>Toggle each feature on or off below:</p>';
-        },
-        'fcom-settings'
-    );
-
-    add_settings_field(
-        'fcom_enable_user_defaults',
-        'Default Notification Settings for New Users',
-        'fcom_render_checkbox_user_defaults',
-        'fcom-settings',
-        'fcom_main_section'
-    );
-
-    add_settings_field(
-        'fcom_enable_space_sync',
-        'Auto-Sync Notification Settings When New Spaces Are Created',
-        'fcom_render_checkbox_space_sync',
-        'fcom-settings',
-        'fcom_main_section'
-    );
-
-    add_settings_section(
-        'fcom_manual_section',
-        'Manual Tools',
-        null,
-        'fcom-settings'
-    );
-}
-
-/**
- * Render checkbox: Enable default prefs for new users.
- */
-function fcom_render_checkbox_user_defaults() {
-    $value = get_option('fcom_enable_user_defaults', '1');
-    echo '<input type="checkbox" name="fcom_enable_user_defaults" value="1" ' . checked(1, $value, false) . '> Enable';
-}
-
-/**
- * Render checkbox: Enable space sync.
- */
-function fcom_render_checkbox_space_sync() {
-    $value = get_option('fcom_enable_space_sync', '1');
-    echo '<input type="checkbox" name="fcom_enable_space_sync" value="1" ' . checked(1, $value, false) . '> Enable';
-}
-
-/**
- * Render the settings page.
- */
-function fcom_render_settings_page() {
+// Render the settings page
+function fcc_render_settings_page() {
     ?>
     <div class="wrap">
-        <h1>FluentCommunity Customizer</h1>
-
-        <?php if (isset($_GET['notifications']) && $_GET['notifications'] === 'success') : ?>
-            <div class="notice notice-success is-dismissible">
-                <p>Notifications applied to all existing users.</p>
-            </div>
-        <?php endif; ?>
+        <h1>FluentCommunity Settings</h1>
 
         <form method="post" action="options.php">
             <?php
-                settings_fields('fcom_settings_group');
-                do_settings_sections('fcom-settings');
-                submit_button('Save Changes');
+            settings_fields('fcc_settings_group');
+            do_settings_sections('fluentcommunity-settings');
+            submit_button();
             ?>
         </form>
 
         <hr>
+        <h2>Plugin Logs</h2>
+        <p>These logs show actions taken by the plugin, such as auto-applying settings to users or handling new spaces.</p>
 
-        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
-            <?php wp_nonce_field('fcom_apply_notifications'); ?>
-            <input type="hidden" name="action" value="fcom_apply_notifications_now">
-            <?php submit_button('Apply Default Notifications to All Users'); ?>
+        <?php
+        $log_file = plugin_dir_path(__DIR__) . '../fluentcommunity.log';
+
+        // Clear log if requested and nonce verified
+        if (
+            isset($_POST['fcc_clear_log']) &&
+            check_admin_referer('fcc_clear_log_action', 'fcc_clear_log_nonce')
+        ) {
+            fcc_clear_log();
+            echo '<div class="updated"><p>Log cleared.</p></div>';
+        }
+
+        // Load and truncate log (optional safety limit)
+        $log_contents = fcc_get_log_contents();
+        $max_chars = 10000;
+        if (strlen($log_contents) > $max_chars) {
+            $log_contents = substr($log_contents, -$max_chars);
+            $log_contents = "[... truncated ...]\n" . $log_contents;
+        }
+        ?>
+
+        <form method="post">
+            <?php wp_nonce_field('fcc_clear_log_action', 'fcc_clear_log_nonce'); ?>
+            <textarea readonly rows="15" style="width:100%; font-family:monospace;"><?php echo esc_textarea($log_contents); ?></textarea>
+            <p>
+                <button type="submit" name="fcc_clear_log" class="button button-secondary">Clear Log</button>
+            </p>
         </form>
     </div>
+    <?php
+}
+
+// Register settings
+function fcc_register_settings() {
+    register_setting('fcc_settings_group', 'fcc_auto_apply_new_users');
+    register_setting('fcc_settings_group', 'fcc_auto_apply_new_spaces');
+
+    add_settings_section('fcc_main_section', 'Preferences', null, 'fluentcommunity-settings');
+
+    add_settings_field(
+        'fcc_auto_apply_new_users',
+        'Auto apply preferences for new users?',
+        'fcc_checkbox_callback',
+        'fluentcommunity-settings',
+        'fcc_main_section',
+        ['label_for' => 'fcc_auto_apply_new_users']
+    );
+
+    add_settings_field(
+        'fcc_auto_apply_new_spaces',
+        'Auto apply notifications to new spaces?',
+        'fcc_checkbox_callback',
+        'fluentcommunity-settings',
+        'fcc_main_section',
+        ['label_for' => 'fcc_auto_apply_new_spaces']
+    );
+}
+add_action('admin_init', 'fcc_register_settings');
+
+// Reusable checkbox field
+function fcc_checkbox_callback($args) {
+    $option = get_option($args['label_for'], false);
+    ?>
+    <input type="checkbox"
+           id="<?php echo esc_attr($args['label_for']); ?>"
+           name="<?php echo esc_attr($args['label_for']); ?>"
+           value="1"
+           <?php checked(1, $option, true); ?> />
     <?php
 }
